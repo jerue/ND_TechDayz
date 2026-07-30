@@ -1,8 +1,8 @@
-# ServiceNow Workspace TechDayz Lab
+# NDIT TechDayz - Triaging VPN Outages in Service Operations Workspace
 
-## Service Operations Workspace: an agent-focused introduction
+## Service Operations Workspace: guided VPN incident response
 
-**Audience:** ServiceNow agents and platform-adjacent team members who are familiar with working records but are not expected to configure or develop a workspace.
+**Audience:** ServiceNow agents and platform-adjacent team members who are familiar with working records but are not expected to configure or develop a workspace or Playbook.
 
 **Core lab time:** 35 minutes
 
@@ -14,282 +14,375 @@
 
 By the end of this lab, you should be able to:
 
-1. Find relevant work in Service Operations Workspace (SOW).
-2. Work an incident from intake through a documented next step without losing context.
-3. Use the record’s related information to support a decision.
-4. Explain when a focused workspace helps an agent and when Core UI may still be the better surface.
-5. Recognize that one user may legitimately work in more than one workspace, depending on their role.
+1. Find and open assigned work in Service Operations Workspace (SOW).
+2. Use the information on an Incident to understand the affected service and configuration item.
+3. Follow a Playbook that guides investigation and presents relevant knowledge in the flow of work.
+4. Use the Playbook to act on an Outage related to the Incident without leaving the Incident record.
+5. Document the result so another agent can understand what was checked and what changed.
+6. Explain how a focused workspace and a Playbook can reduce navigation and make a repeatable process easier to follow.
 
 ## Before you begin
 
-This is an agent workflow lab. You are not expected to build or publish a workspace.
+This is an agent workflow lab. You will use a Playbook, but you are not expected to build, configure, or publish one.
 
-The facilitator should replace the values below before the event.
-
-| Lab item | Fill in before the session |
+| Lab item | Lab value |
 | --- | --- |
-| SOW landing page or navigation path | `https://northdakotasandbox.service-now.com/sow` |
-| Lab incident | `<INC>` — recommended scenario: repeated VPN authentication prompts |
-| Lab knowledge article | `<>` — recommended: VPN authentication troubleshooting checklist |
-| Lab CI / service | `<LAB-CI-NAME>` / `<LAB-SERVICE-NAME>` |
-| Lab assignment group | `<NDIT-End User Compute>` |`<NDIT-Network Services>` | `<NDIT-Lab Agent>` |
+| Sandbox URL | `<https://northdakotasandbox.service-now.com>` |
+| SOW landing page or navigation path | `</now/sow>` |
+| Lab incident short description | `[LAB-username]` — Unable to connect to GlobalProtect VPN |
+| Lab knowledge article | `<KB0018355 v1.0>` — recommended: VPN authentication troubleshooting checklist |
+| Lab CI / service | `<Corporate VPN - Production>` / `<Employee Remote Connectivity>` |
+| Lab assignment group | `<NDIT-End User Compute>` |
+
+### Screenshot convention
+
+Screenshot placeholders appear after each participant action. The paths assume this guide will be stored in `docs/` and its screenshots in `assets/screenshots/`. Replace each placeholder filename with the final image while preserving useful alternative text.
 
 ### Facilitator setup checklist
 
-- Use a dedicated sandbox or sub-production instance with fictional records only. Do not ask attendees to exercise a live production incident.
-- Confirm that the Service Operations Workspace for ITSM application is installed and that participants can launch it. The current application listing is `sn_sow_itsm_cont`; exact installation and compatibility requirements depend on your release and entitlements.
-- Give each participant the normal ITSM access needed to read and update the seeded incident. A common SOW role is `sn_sow_user`, but it is not a replacement for your normal incident ACLs and role bundle—validate your local configuration first.
-- Seed one incident with a caller, assignment group, affected CI/service, a related knowledge article, and enough activity history to make investigation realistic.
-- Ensure that actions such as emails, notifications, integrations, or flows are disabled or redirected for the lab data if they could reach real people or systems.
-- If Agent Assist, Recommended Actions, investigation tabs, or collaboration are not enabled in your sandbox, leave them out rather than improvising configuration during the event. The core lab still works.
+- Use the North Dakota sandbox and fictional lab records only. Do not ask attendees to exercise a live production Incident or Outage.
+- Confirm that participants can sign in, launch SOW at `/now/sow`, and read and update their generated Incident.
+- Confirm that each participant has an Incident whose short description begins with the participant-specific `[LAB-username]` value.
+- Confirm that each Incident uses the assignment group `<NDIT-End User Compute>`, CI `<Corporate VPN - Production>`, and service `<Employee Remote Connectivity>`.
+- Confirm that each Incident has its own active Outage with an empty **End** value.
+- Confirm that the VPN Playbook starts for each generated Incident and appears in the native SOW **Playbook** tab.
+- Confirm that participants can read `<KB0018355 v1.0>` and complete the Playbook activities.
+- Run the complete path with a normal attendee account before the session. Verify that the Playbook finds the Incident’s related Outage and updates its **End** value.
+- Ensure that emails, notifications, integrations, or flows are disabled or redirected if the lab data could otherwise reach real people or systems.
 
-### Recommended lab scenario
+### Lab scenario
 
-Use a small, intentionally safe record set.
+You are an End User Compute agent responding to an employee who cannot connect to the GlobalProtect VPN. The Incident has already been created for you and includes the affected CI and service. A Playbook will guide you through the troubleshooting sequence, surface the relevant knowledge article, evaluate the result, find the Incident’s associated Outage, and let you record that service has been restored.
 
-| Record | Recommended value |
+| Record or field | Lab value |
 | --- | --- |
-| Incident | `<LAB-INCIDENT-NUMBER>` — “Repeated VPN authentication prompts after password reset” |
-| Caller | `Avery Chen` (fictional) |
-| Assignment group | `<LAB-ASSIGNMENT-GROUP>` / Network Operations |
-| Affected CI | `<LAB-CI-NAME>` / `VPN-GW-01` |
-| Business service | `<LAB-SERVICE-NAME>` / Remote Access Service |
-| Knowledge | `<LAB-KB-NUMBER>` — “Troubleshoot repeated VPN authentication prompts” |
-| Starting state | New or Assigned; Priority 2; assigned to the lab group, not an individual |
+| Incident short description | `[LAB-username]` — Unable to connect to GlobalProtect VPN |
+| Assignment group | `<NDIT-End User Compute>` |
+| Affected CI | `<Corporate VPN - Production>` |
+| Business service | `<Employee Remote Connectivity>` |
+| Knowledge | `<KB0018355 v1.0>` — VPN authentication troubleshooting checklist |
+| Related Outage | One active Outage associated with the participant’s Incident |
+| Outage starting condition | **Begin** is populated and **End** is empty |
 
 ## Lab conventions
 
-- Labels, tabs, and actions vary by ServiceNow release and your instance configuration. Use the equivalent function if the wording differs.
-- Do not change the CI, service, knowledge article, assignment group, or workspace configuration unless an exercise explicitly tells you to do so.
-- Make all updates on the seeded lab incident only.
-- If you do not see an optional capability, record that observation and continue. A missing panel is not a failure.
+- Labels, tabs, and actions may vary slightly by ServiceNow release and local configuration. Use the equivalent function if the wording differs.
+- Work only on the Incident whose short description begins with your `[LAB-username]`.
+- Do not change the CI, service, assignment group, Playbook configuration, or workspace configuration.
+- Complete Playbook activities in order. Later activities may depend on information or decisions produced by earlier activities.
+- Do not open and manually edit the Outage unless the guide explicitly asks you to verify it. The Playbook performs the update.
+- If the Playbook is missing, does not advance, or displays the wrong Incident, stop and ask the facilitator for assistance instead of improvising around it.
 
 ---
 
-## Exercise 1 — Find and frame the work (5 minutes)
+## Exercise 1 — Open SOW and find your Incident (5 minutes)
 
 ### Goal
 
-Orient yourself in SOW and identify the work that needs attention.
+Orient yourself in SOW and locate the work created for your lab account.
 
-1. Open `<YOUR-SOW-LANDING-PAGE>`.
-2. Take 30 seconds to identify the navigation pane, landing page, work queues or lists, and any alerts or assigned-work indicators your experience exposes.
-3. Navigate to the incident work list for "Assigned to Me". You will then be able to see an incident,  `<LAB-INCIDENT-NUMBER>`.
-4. Filter or sort the list so the lab incident is easy to find. Do not save a personal list layout unless your facilitator asks you to.
-5. Open the incident in a workspace tab.
+1. Sign in to `<https://northdakotasandbox.service-now.com>`.
 
-### Checkpoint
+   ![Sign in to the North Dakota sandbox](../assets/screenshots/01-sign-in.png)
 
-Write down one piece of information that was available before you opened the record. Examples: priority, assignment group, SLA indicator, caller, service, or a queue count.
+2. Open Service Operations Workspace by navigating to `</now/sow>`.
 
-> Reflection: What did the workspace put in front of you that you would otherwise have had to find through navigation?
+   ![Open Service Operations Workspace](../assets/screenshots/02-open-sow.png)
 
----
+3. Take 30 seconds to identify the navigation pane, landing page, work lists or queues, and any assigned-work indicators exposed by your SOW experience.
 
-## Exercise 2 — Take ownership and document the next step (8 minutes)
+   ![Identify the SOW navigation and work areas](../assets/screenshots/03-sow-orientation.png)
 
-### Goal
-
-Work the incident safely while preserving an auditable record.
-
-1. On the incident record, confirm the short description, caller, priority, assignment group, and current state.
-2. Review the activity stream or record history before changing anything.
-3. Assign the incident to yourself, or use the lab owner named by the facilitator.
-4. Change the state to **In Progress** or your sandbox’s equivalent active state.
-5. Add this work note, replacing the bracketed text:
+4. Open the Incident list or assigned-work queue and locate the Incident with this short description:
 
    ```text
-   Initial investigation started in SOW. Reviewed [CI/service] and [knowledge or related record]. Next step: [specific, safe next action].
+   [LAB-username] — Unable to connect to GlobalProtect VPN
    ```
 
-6. Save or update the record.
-7. Re-open the activity stream entry and verify that your change is visible.
+   Replace `username` with the value associated with your lab account.
+
+   ![Locate the participant VPN Incident](../assets/screenshots/04-find-lab-incident.png)
+
+5. Open the Incident in a workspace tab.
+
+   ![Open the VPN Incident](../assets/screenshots/05-open-incident.png)
 
 ### Checkpoint
 
-Can a teammate who was not present understand what you checked and what happens next?
+Confirm that the short description begins with your lab username. Do not continue on another participant’s Incident.
 
-> Reflection: Which updates feel like agent work, and which fields still feel like pure record maintenance?
+> Reflection: What information about the Incident was visible before you opened the record?
 
 ---
 
-## Exercise 3 — Use context rather than opening a scavenger hunt (8 minutes)
+## Exercise 2 — Frame the Incident and take ownership (7 minutes)
 
 ### Goal
 
-Use the incident’s related information to form a reasonable troubleshooting direction.
+Confirm that you have the correct record, understand the affected service, and leave an auditable starting point.
 
-1. Locate the affected CI or business service on the incident.
-2. Open the record’s related-information view, contextual side panel, or equivalent tab.
-3. Find `<LAB-CI-NAME>` and `<LAB-SERVICE-NAME>`. Do not edit either record.
-4. Open `<LAB-KB-NUMBER>` through the record, Agent Assist, a related list, or search—use the route exposed in your workspace.
-5. Identify one troubleshooting step from the article that applies to this incident.
-6. Add a second work note:
+1. Confirm the Incident short description:
 
    ```text
-   Context review: [KB number/title] recommends [one applicable step]. Related service/CI reviewed: [name].
+   [LAB-username] — Unable to connect to GlobalProtect VPN
    ```
 
-7. Save the incident.
+   ![Confirm the Incident short description](../assets/screenshots/06-confirm-short-description.png)
 
-### Checkpoint
+2. Confirm that the Incident is assigned to `<NDIT-End User Compute>`.
 
-Record the path you used:
+   ![Confirm the assignment group](../assets/screenshots/07-confirm-assignment-group.png)
 
-```text
-Incident → ____________________ → ____________________ → KB / CI / service
-```
-
-> Reflection: Did the record page help you gather context in one flow, or did it push you back into separate navigation? Be specific.
-
-### Optional: Agent Assist (2 minutes, only if enabled)
-
-Open the Agent Assist panel. ServiceNow documents it as a way to find similar Universal Requests, knowledge articles, catalog items, and pinned articles.
-
-- Find one potentially relevant suggestion.
-- Do not apply or publish generated/recommended content automatically.
-- Add a work note only if the suggestion is actually useful and you have verified it.
-
----
-
-## Exercise 4 — Collaborate without losing the record (6 minutes)
-
-### Goal
-
-Practice a safe handoff or escalation in the same work context.
-
-Choose one path that your sandbox supports:
-
-### Path A — Work-note handoff (works in every lab)
-
-1. Add a work note that names the next team or role that would own the next technical decision.
-2. Include the evidence that person needs: the CI/service, the relevant knowledge step, and the observed symptom.
-3. Save the record.
-
-### Path B — Assign or create follow-on work (only if seeded and safe)
-
-1. Use the incident’s available action to assign to the lab escalation group or create a **lab-only** follow-on task.
-2. Link the follow-on work to the incident.
-3. Verify that the original incident still tells the full story.
-
-### Path C — Collaboration integration (only if explicitly enabled)
-
-Use a sandbox collaboration action to add a lab-only discussion or shared context. Do not create a real Teams channel, conference call, notification, or external message.
-
-### Checkpoint
-
-Before you move on, answer this: If the incident opened in a second workspace tab, would its status and context still be trustworthy? Why?
-
----
-
-## Exercise 5 — See the multi-workspace reality (4 minutes)
-
-### Goal
-
-Understand that workspaces are role-specific experiences, not separate identities.
-
-1. Open the application launcher or your organization’s workspace switcher.
-2. Identify another workspace that your current roles allow you to use. This could be CSM Configurable Workspace, CMDB Workspace, HR Agent Workspace, Security Operations Workspace, SPM, or another locally relevant experience.
-3. Do not request new access or attempt to work records outside the lab scope.
-4. If you do not have a second workspace, use the facilitator’s demonstration or screenshot instead.
-5. Record the answer:
+3. Confirm the related service and CI:
 
    ```text
-   My current role could legitimately use ____________________ in addition to SOW because ____________________.
+   Service: Employee Remote Connectivity
+   CI: Corporate VPN - Production
    ```
 
+   Do not edit either value.
+
+   ![Review the related service and CI](../assets/screenshots/08-review-service-ci.png)
+
+4. Review the activity stream or record history before changing the Incident.
+
+   ![Review the Incident activity stream](../assets/screenshots/09-review-activity-stream.png)
+
+5. Assign the Incident to yourself, or use the lab owner specified by the facilitator, and change the state to **In Progress** or the equivalent active state used in the sandbox.
+
+   ![Assign the Incident and set it to In Progress](../assets/screenshots/10-take-ownership.png)
+
+6. Add the following work note:
+
+   ```text
+   Investigation started in Service Operations Workspace. Confirmed the affected service is Employee Remote Connectivity and the affected CI is Corporate VPN - Production. Beginning the guided VPN troubleshooting Playbook.
+   ```
+
+   ![Add the initial investigation work note](../assets/screenshots/11-add-initial-work-note.png)
+
+7. Save or update the Incident and verify that the work note appears in the activity stream.
+
+   ![Save the Incident and verify the work note](../assets/screenshots/12-verify-initial-update.png)
+
 ### Checkpoint
 
-What remains the same when you move among workspaces? Think in terms of data, access controls, ownership, and audit history.
+Another agent should now be able to tell who owns the Incident, what is affected, and what guided process you are starting.
 
 ---
 
-## Exercise 6 — Compare intentionally, do not declare a winner by default (4 minutes)
+## Exercise 3 — Use the Playbook to investigate and restore service (15 minutes)
 
 ### Goal
 
-Choose the best work surface for the task rather than treating a workspace as a mandatory replacement.
+Follow a repeatable process that brings guidance, knowledge, decisions, and related-record actions into the Incident experience.
 
-1. If your facilitator has supplied a safe Core UI link, open the same lab incident in Core UI. Otherwise, use the record’s available classic/open-in-platform option or observe the facilitator’s comparison.
-2. Compare the two experiences using the table below.
+1. Open the native **Playbook** tab or Playbook panel on the Incident record.
 
-| Question | SOW observation | Core UI observation |
-| --- | --- | --- |
-| How did I find the record? |  |  |
-| What context was immediately visible? |  |  |
-| What did I need to navigate elsewhere to find? |  |  |
-| Which view better supported this exact task? |  |  |
+   ![Open the native Playbook tab](../assets/screenshots/13-open-playbook.png)
 
-3. Choose one task category that belongs primarily in SOW and one that may still belong in Core UI.
+2. Confirm that the VPN troubleshooting Playbook is attached to your Incident and review its visible stages or activities before starting.
+
+   If no Playbook appears, stop and ask the facilitator for assistance.
+
+   ![Review the VPN troubleshooting Playbook](../assets/screenshots/14-review-playbook.png)
+
+3. Begin the first available Playbook activity and follow the instructions presented in SOW.
+
+   Complete activities in order; do not skip ahead.
+
+   ![Begin the first Playbook activity](../assets/screenshots/15-start-playbook.png)
+
+4. Open and review `<KB0018355 v1.0>` when the Playbook presents the knowledge step.
+
+   Use the article’s VPN authentication troubleshooting checklist to identify the recommended checks. Do not edit the knowledge article.
+
+   ![Review KB0018355 version 1.0](../assets/screenshots/16-review-kb0018355.png)
+
+5. Complete the guided troubleshooting activity using the checklist in `<KB0018355 v1.0>`.
+
+   For this simulation, follow the facilitator’s lab instructions rather than making changes to your own device or credentials.
+
+   ![Complete the VPN troubleshooting checklist](../assets/screenshots/17-complete-troubleshooting.png)
+
+6. When the Playbook asks whether the VPN connection is now successful, select **No** so the lab continues through the active-Outage path.
+
+   This response is part of the simulation. It does not indicate that the troubleshooting checklist was performed incorrectly.
+
+   ![Select No for the connection-success question](../assets/screenshots/18-answer-connection-question.png)
+
+7. Continue the Playbook and allow it to locate the Outage associated with your Incident.
+
+   The Playbook uses the Incident-to-Outage relationship prepared for the lab. Do not search for or substitute another participant’s Outage.
+
+   ![Allow the Playbook to locate the related Outage](../assets/screenshots/19-locate-related-outage.png)
+
+8. Review the Outage information presented by the Playbook and confirm that it relates to your Incident and `<Corporate VPN - Production>`.
+
+   The Outage should be active: **Begin** is populated and **End** is empty.
+
+   ![Review the active related Outage](../assets/screenshots/20-review-active-outage.png)
+
+9. Complete the Playbook activity that records restoration of the VPN service.
+
+   The Playbook updates the related Outage’s **End** value directly from the Incident experience. You are demonstrating what the platform can do; you are not defining a production authorization or governance model for who should end Outages.
+
+   ![Complete the Outage restoration activity](../assets/screenshots/21-complete-outage-restoration.png)
+
+10. Verify that the Playbook activity completes successfully and advances to its final instruction or completion state.
+
+    If the activity fails or the Playbook does not advance, stop and show the facilitator the visible error.
+
+    ![Verify successful Playbook completion](../assets/screenshots/22-verify-playbook-completion.png)
 
 ### Checkpoint
 
-Finish this sentence:
+You have used one guided experience to review knowledge, record a troubleshooting decision, find a related Outage, and update that Outage without navigating away from the Incident.
 
-> A workspace is the better default for ____________________, while Core UI is still useful for ____________________.
+> Reflection: Which parts of this sequence did the Playbook make easier to remember or harder to perform out of order?
 
 ---
 
-## Optional extension — Observe the configuration boundary (5–8 minutes)
-
-This extension is for observation, not editing.
-
-### Recommended control
-
-Do **not** give every attendee broad `admin` access merely for this exercise. The core lab does not require it. If you want to show the configuration layer, use a dedicated sandbox, an isolated lab copy, a temporary least-privilege account where feasible, or a facilitator-led screen share.
+## Exercise 4 — Verify and document the outcome (5 minutes)
 
 ### Goal
 
-See that a workspace is configured intentionally, while keeping the team’s focus on agent outcomes.
+Confirm that the related record changed and leave enough context for the next agent.
 
-1. Open the SOW administration or UI Builder experience that the facilitator has prepared.
-2. Open an existing **lab-only** record page or landing page in read-only/observe mode.
-3. Identify three concepts without changing anything:
-   - A page or route.
-   - A component or panel.
-   - An audience, role, or variant that controls who sees an experience.
-4. Close the builder without saving, publishing, or changing variants.
+1. Use the related information available from the Incident or Playbook to verify that the associated Outage now has an **End** value.
 
-### Reflection
+   Do not manually change the Outage. You are verifying the Playbook’s result.
 
-What agent problem would justify a configuration change? “It looks different” is not enough; identify a Find, Understand, or Act problem.
+   ![Verify the Outage End value](../assets/screenshots/23-verify-outage-end.png)
+
+2. Return to the Incident record if the verification opened another workspace tab or panel.
+
+   ![Return to the Incident record](../assets/screenshots/24-return-to-incident.png)
+
+3. Add the following work note:
+
+   ```text
+   Completed the guided VPN troubleshooting Playbook. Reviewed KB0018355 v1.0 and the Corporate VPN - Production CI. The Playbook located the Incident's related active Outage and recorded the service restoration time.
+   ```
+
+   ![Document the Playbook outcome](../assets/screenshots/25-document-outcome.png)
+
+4. Save or update the Incident.
+
+   ![Save the completed Incident update](../assets/screenshots/26-save-outcome.png)
+
+5. Review the activity stream and confirm that both lab work notes are visible in chronological order.
+
+   ![Review the completed Incident history](../assets/screenshots/27-review-completed-history.png)
+
+### Checkpoint
+
+Can a teammate who did not attend the lab understand what you reviewed, what the Playbook did, and which related record changed?
 
 ---
+
+## Exercise 5 — Evaluate the experience (3 minutes)
+
+### Goal
+
+Connect the lab steps to the design purpose of SOW and Playbooks.
+
+1. Review the Incident, Playbook, knowledge article, service/CI context, and Outage result as one completed unit of work.
+
+   ![Review the complete workspace experience](../assets/screenshots/28-review-complete-experience.png)
+
+2. Record one place where SOW reduced navigation or kept useful context near the Incident.
+
+   ![Record the SOW navigation observation](../assets/screenshots/29-record-sow-observation.png)
+
+3. Record one place where the Playbook made the process more repeatable, understandable, or auditable.
+
+   ![Record the Playbook observation](../assets/screenshots/30-record-playbook-observation.png)
+
+4. Finish this sentence:
+
+   > The Playbook was most useful when ____________________, because ____________________.
+
+   ![Complete the lab reflection](../assets/screenshots/31-complete-reflection.png)
+
+### Checkpoint
+
+Be prepared to share one specific observation during the debrief.
+
+---
+
+## Optional extension — Compare SOW and Core UI (5–8 minutes)
+
+This extension is for comparison, not configuration.
+
+### Goal
+
+Choose the work surface that best supports the task instead of declaring one interface the winner by default.
+
+1. If the facilitator has supplied a safe Core UI link, open the same lab Incident in Core UI. Otherwise, observe the facilitator’s comparison.
+
+   ![Open or observe the Incident in Core UI](../assets/screenshots/32-open-core-ui.png)
+
+2. Compare the same Incident in both experiences.
+
+   ![Compare SOW and Core UI](../assets/screenshots/33-compare-work-surfaces.png)
+
+3. Complete the table below.
+
+   | Question | SOW observation | Core UI observation |
+   | --- | --- | --- |
+   | How did I find the record? |  |  |
+   | What context was immediately visible? |  |  |
+   | Where was the guided Playbook available? |  |  |
+   | What did I need to navigate elsewhere to find? |  |  |
+   | Which view better supported this exact task? |  |  |
+
+   ![Complete the SOW and Core UI comparison](../assets/screenshots/34-complete-comparison.png)
+
+4. Finish this sentence:
+
+   > SOW is the better default for ____________________, while Core UI is still useful for ____________________.
+
+   ![Record the work-surface conclusion](../assets/screenshots/35-record-comparison-conclusion.png)
 
 ## Debrief prompts (8 minutes)
 
-Use these questions as a group.
+Use these questions as a group:
 
-1. Where did SOW reduce navigation or context switching in this scenario?
-2. What information was missing, noisy, or too far from the decision point?
-3. Which capability was configuration-dependent in your sandbox?
-4. What work should remain in Core UI for now, and why?
-5. If an agent has access to multiple workspaces, what should guide the default landing experience?
-6. What is one small experience improvement that would make the lab workflow more reliable?
+1. Where did SOW reduce navigation or context switching?
+2. What did the Playbook make easier to understand or harder to perform out of order?
+3. What was useful about seeing the knowledge guidance within the guided process?
+4. What did it mean for the Playbook to act on an Outage related to the Incident?
+5. What access-control, approval, ownership, or governance questions would need answers before using this exact Outage update in production?
+6. Which part of the experience depended on local configuration rather than SOW alone?
+7. What is one small improvement that would make this guided workflow more reliable for an agent?
 
 ## Completion criteria
 
 You are done when you have:
 
-- Updated the seeded incident with an ownership change and two useful work notes.
-- Used a related CI, service, knowledge article, or equivalent context to support the next step.
-- Identified a second workspace or explained why you do not need one for your role.
-- Made one evidence-based observation about when SOW helps and when Core UI still fits.
+- Opened your participant-specific Incident in SOW.
+- Confirmed `<NDIT-End User Compute>`, `<Corporate VPN - Production>`, and `<Employee Remote Connectivity>` on the Incident.
+- Reviewed `<KB0018355 v1.0>` through the Playbook.
+- Completed the Playbook’s VPN troubleshooting and decision path.
+- Used the Playbook to record the **End** value on your Incident’s related Outage.
+- Added work notes that document the investigation and result.
+- Made one evidence-based observation about the value of SOW and the Playbook.
 
 ## Facilitator reset
 
 After the session:
 
-1. Restore the seeded incident to its starting state, assignment, and work notes, or clone a new record set for the next cohort.
-2. Remove temporary access and any time-bound elevation.
-3. Verify that no test notifications, collaboration artifacts, external messages, or follow-on tasks escaped the sandbox.
-4. Collect participant observations under the three categories: **Find**, **Understand**, and **Act**.
+1. Confirm the number of completed participant Incidents and Playbook executions.
+2. Confirm that each participant updated only the Outage associated with that participant’s Incident.
+3. Use the approved lab cleanup process to remove or reset generated Incidents, Outages, Playbook executions, assignments, and work notes.
+4. Remove any temporary access or time-bound elevation used for the session.
+5. Verify that no test notifications, collaboration artifacts, external messages, or follow-on tasks escaped the sandbox.
+6. Collect participant observations under the categories **Find**, **Understand**, **Act**, and **Guide**.
 
 ## Source and facilitator references
 
 - [Service Operations Workspace for ITSM — ServiceNow Docs](https://www.servicenow.com/docs/r/it-service-management/service-operations-workspace/sow-landing-page.html)
+- [Playbook Experience overview — ServiceNow Docs](https://www.servicenow.com/docs/r/build-workflows/workflow-studio/playbook-ui.html)
+- [Customize the Playbook Experience — ServiceNow Docs](https://www.servicenow.com/docs/r/build-workflows/workflow-studio/playbook-customize-playbook.html)
 - [Use Agent Assist in Service Operations Workspace — ServiceNow Docs](https://www.servicenow.com/docs/r/it-service-management/service-operations-workspace/agent-assist-ur-sow.html)
-- [Redirect UI16 module links to Service Operations Workspace — ServiceNow Docs](https://www.servicenow.com/docs/r/it-service-management/service-operations-workspace/redirect-ui16-module-links-sow.html)
 - [Forms in the classic environment — ServiceNow Docs](https://www.servicenow.com/docs/r/platform-user-interface/c_UsingForms.html)
-- [List of workspaces — ServiceNow Docs](https://www.servicenow.com/docs/r/platform-user-interface/list-of-workspaces.html)
-- [Employee Slate — ServiceNow Docs](https://www.servicenow.com/docs/r/employee-service-management/employee-experience-foundation/employee-slate-landing-page.html)
