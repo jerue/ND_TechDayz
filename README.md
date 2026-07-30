@@ -8,7 +8,6 @@
 
 **Optional extension:** 5–8 minutes
 
-**Session design:** 12 minutes of presentation + 35 minutes of lab + 8 minutes of debrief + 5 minutes of buffer.
 
 ## What you will learn
 
@@ -34,23 +33,9 @@ This is an agent workflow lab. You will use a Playbook, but you are not expected
 | Lab CI / service | `<Corporate VPN - Production>` / `<Employee Remote Connectivity>` |
 | Lab assignment group | `<NDIT-End User Compute>` |
 
-### Screenshot convention
 
-Screenshot placeholders appear after each participant action. The paths assume this guide will be stored in `docs/` and its screenshots in `assets/screenshots/`. Replace each placeholder filename with the final image while preserving useful alternative text.
 
-### Facilitator setup checklist
-
-- Use the North Dakota sandbox and fictional lab records only. Do not ask attendees to exercise a live production Incident or Outage.
-- Confirm that participants can sign in, launch SOW at `/now/sow`, and read and update their generated Incident.
-- Confirm that each participant has an Incident whose short description begins with the participant-specific `[LAB-username]` value.
-- Confirm that each Incident uses the assignment group `<NDIT-End User Compute>`, CI `<Corporate VPN - Production>`, and service `<Employee Remote Connectivity>`.
-- Confirm that each Incident has its own active Outage with an empty **End** value.
-- Confirm that the VPN Playbook starts for each generated Incident and appears in the native SOW **Playbook** tab.
-- Confirm that participants can read `<KB0018355 v1.0>` and complete the Playbook activities.
-- Run the complete path with a normal attendee account before the session. Verify that the Playbook finds the Incident’s related Outage and updates its **End** value.
-- Ensure that emails, notifications, integrations, or flows are disabled or redirected if the lab data could otherwise reach real people or systems.
-
-### Lab scenario
+### Scenario
 
 You are an End User Compute agent responding to an employee who cannot connect to the GlobalProtect VPN. The Incident has already been created for you and includes the affected CI and service. A Playbook will guide you through the troubleshooting sequence, surface the relevant knowledge article, evaluate the result, find the Incident’s associated Outage, and let you record that service has been restored.
 
@@ -83,11 +68,11 @@ Orient yourself in SOW and locate the work created for your lab account.
 
 1. Sign in to `<https://northdakotasandbox.service-now.com>`.
 
-   ![Sign in to the North Dakota sandbox](../assets/screenshots/01-sign-in.png)
+   ![Sign in to the North Dakota sandbox](images/sow_home_1.png)
 
 2. Open Service Operations Workspace by navigating to `</now/sow>`.
 
-   ![Open Service Operations Workspace](../assets/screenshots/02-open-sow.png)
+   ![Open Service Operations Workspace](images/sow_home_2.png)
 
 3. Take 30 seconds to identify the navigation pane, landing page, work lists or queues, and any assigned-work indicators exposed by your SOW experience.
 
@@ -111,7 +96,11 @@ Orient yourself in SOW and locate the work created for your lab account.
 
 Confirm that the short description begins with your lab username. Do not continue on another participant’s Incident.
 
+
+
 > Reflection: What information about the Incident was visible before you opened the record?
+
+
 
 ---
 
@@ -164,9 +153,12 @@ Confirm that you have the correct record, understand the affected service, and l
 
    ![Save the Incident and verify the work note](../assets/screenshots/12-verify-initial-update.png)
 
+
+
 ### Checkpoint
 
 Another agent should now be able to tell who owns the Incident, what is affected, and what guided process you are starting.
+
 
 ---
 
@@ -204,7 +196,10 @@ Follow a repeatable process that brings guidance, knowledge, decisions, and rela
 
    ![Complete the VPN troubleshooting checklist](../assets/screenshots/17-complete-troubleshooting.png)
 
-6. When the Playbook asks whether the VPN connection is now successful, select **No** so the lab continues through the active-Outage path.
+
+BONUS: Try locating a knowledge article using the **Agent Assist** feature, while you have the Playbook open.  
+
+6. When the Playbook asks whether the VPN connection is now successful, select **YES** so the lab continues through the active-Outage path.
 
    This response is part of the simulation. It does not indicate that the troubleshooting checklist was performed incorrectly.
 
@@ -236,7 +231,9 @@ Follow a repeatable process that brings guidance, knowledge, decisions, and rela
 
 ### Checkpoint
 
-You have used one guided experience to review knowledge, record a troubleshooting decision, find a related Outage, and update that Outage without navigating away from the Incident.
+
+You have used one guided experience to review knowledge, record a troubleshooting decision, find a related Outage, and update that Outage without navigating away from the Incident tab.
+
 
 > Reflection: Which parts of this sequence did the Playbook make easier to remember or harder to perform out of order?
 
@@ -318,7 +315,7 @@ This extension is for comparison, not configuration.
 
 Choose the work surface that best supports the task instead of declaring one interface the winner by default.
 
-1. If the facilitator has supplied a safe Core UI link, open the same lab Incident in Core UI. Otherwise, observe the facilitator’s comparison.
+1. Open the same incident in the Core platform (Hint: navigate back to https://northdakotasandbox.service-now.com in a new tab).
 
    ![Open or observe the Incident in Core UI](../assets/screenshots/32-open-core-ui.png)
 
@@ -368,18 +365,8 @@ You are done when you have:
 - Added work notes that document the investigation and result.
 - Made one evidence-based observation about the value of SOW and the Playbook.
 
-## Facilitator reset
 
-After the session:
-
-1. Confirm the number of completed participant Incidents and Playbook executions.
-2. Confirm that each participant updated only the Outage associated with that participant’s Incident.
-3. Use the approved lab cleanup process to remove or reset generated Incidents, Outages, Playbook executions, assignments, and work notes.
-4. Remove any temporary access or time-bound elevation used for the session.
-5. Verify that no test notifications, collaboration artifacts, external messages, or follow-on tasks escaped the sandbox.
-6. Collect participant observations under the categories **Find**, **Understand**, **Act**, and **Guide**.
-
-## Source and facilitator references
+## Additional ServiceNow documentation
 
 - [Service Operations Workspace for ITSM — ServiceNow Docs](https://www.servicenow.com/docs/r/it-service-management/service-operations-workspace/sow-landing-page.html)
 - [Playbook Experience overview — ServiceNow Docs](https://www.servicenow.com/docs/r/build-workflows/workflow-studio/playbook-ui.html)
